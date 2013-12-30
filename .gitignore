@@ -24,3 +24,7 @@
 # some things I'm building into rzswitchblade --
 # maybe one day I'll remove it (or use it better)
 razer-test.c
+
+# test- programs should not be shown
+test-*
+

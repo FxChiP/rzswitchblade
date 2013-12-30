@@ -23,7 +23,7 @@ rzswitchblade_context *rzswitchblade_init() {
 ssize_t rzswitchblade_enumerate_devices(rzswitchblade_context *ctx, rzswitchblade_device **devices) {
 	ssize_t length = 0; 
 	ssize_t i = 0;
-	ssize_t j = -1;
+	ssize_t j = 0;
 	int libusb_stat = 0;
 	rzswitchblade_device *found_devices = NULL;
 	libusb_device **list = NULL;
@@ -50,7 +50,6 @@ ssize_t rzswitchblade_enumerate_devices(rzswitchblade_context *ctx, rzswitchblad
 		libusb_stat = libusb_get_device_descriptor(dev, &dd);
 		if (dd.idVendor == USB_VID_RAZER) {
 			if (dd.idProduct == USB_PID_RAZER_BLADE) { /* TODO: add PIDs as needed */
-				if (j == -1) j = 0; 
 				found_devices[j].dev = dev;
 				libusb_get_active_config_descriptor(dev, &found_devices[j].cfg);
 				found_devices[j].ctx = ctx;
@@ -71,7 +70,7 @@ ssize_t rzswitchblade_enumerate_devices(rzswitchblade_context *ctx, rzswitchblad
 	 */
 	libusb_free_device_list(list, 0);
 
-	length = j+1;
+	length = j;
 	*devices = found_devices;
 	return length;
 }
