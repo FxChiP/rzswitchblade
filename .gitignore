@@ -26,5 +26,7 @@
 razer-test.c
 
 # test- programs should not be shown
-test-*
+# oops -- I do want to commit & push 
+# test-*.c -- silly me.
+bin-test-*
 
