@@ -21,6 +21,11 @@
 #define USB_VID_RAZER       0x1532
 #define USB_PID_RAZER_BLADE 0x0116
 
+#define RZSWITCHBLADE_RAZER_BLADE_SWITCHBLADE_INTERFACE 2
+
+#define RZSWITCHBLADE_RAZER_BLADE_SWITCHBLADE_TP_EP 0x02
+#define RZSWITCHBLADE_RAZER_BLADE_SWITCHBLADE_IB_EP 0x01
+
 /* structs */
 struct _rzswitchblade_context {
 	libusb_context *libusb_ctx;
@@ -41,7 +46,8 @@ typedef struct _rzswitchblade_device rzswitchblade_device;
 
 struct _rzswitchblade_interface {
 	/* libusb use */
-	struct libusb_transfer *transfer;
+	struct libusb_transfer *touchpad_transfer;
+	struct libusb_transfer *ibuttons_transfer;
 
 	/* Internal use */
 	rzswitchblade_device *rzswitchblade_device; 
@@ -58,3 +64,5 @@ typedef struct _rzswitchblade_interface rzswitchblade_interface;
 rzswitchblade_context *rzswitchblade_init();
 ssize_t rzswitchblade_enumerate_devices(rzswitchblade_context *ctx, rzswitchblade_device **devices); 
 rzswitchblade_interface *rzswitchblade_claim_device(rzswitchblade_device *device);
+void rzswitchblade_free_device(rzswitchblade_device *device);
+

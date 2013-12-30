@@ -43,6 +43,7 @@ ssize_t rzswitchblade_enumerate_devices(rzswitchblade_context *ctx, rzswitchblad
 		libusb_free_device_list(list, 1);
 		return -1;
 	}
+	memset(found_devices, 0, sizeof(rzswitchblade_device) * length);
 
 	/* Figure out which devices are good; store them */
 	for (i = 0; i < length; i++) {
@@ -73,5 +74,41 @@ ssize_t rzswitchblade_enumerate_devices(rzswitchblade_context *ctx, rzswitchblad
 	length = j;
 	*devices = found_devices;
 	return length;
+}
+
+rzswitchblade_interface *rzswitchblade_claim_device(rzswitchblade_device *device) {
+	/* A device needs to be claimed.
+	 * Open a handle to it, try to claim the switchblade
+	 * displays' interface, and this will make us ready
+	 * to blit to it
+	 */
+	int libusb_stat = 0;
+	rzswitchblade_interface *ret = NULL;
+	/* ... but first, don't allow this to be done twice */
+	if (device->rzswitchblade_interface) return NULL;
+
+	libusb_stat = libusb_open(device->dev, &device->handle);
+	if (libusb_stat) return NULL; 
+
+	/* device opened.
+	 * Claim interface 2 on Blade devices. I don't know
+	 * what this value is for DeathStalker Ultimate
+	 * devices.
+	 */
+	libusb_stat = libusb_claim_interface(device->handle, RZSWITCHBLADE_RAZER_BLADE_SWITCHBLADE_INTERFACE); 
+	if (libusb_stat) {
+		libusb_close(device->handle);
+		device->handle = NULL;
+		return NULL;
+	}
+
+	/* Interface claimed.
+	 * TODO: More initialization stuff for interfaces.
+	 */
+	ret = (rzswitchblade_interface*)malloc(sizeof(rzswitchblade_interface));
+	memset(ret, 0, sizeof(rzswitchblade_interface));
+
+	ret->rzswitchblade_device = device;
+	return ret;
 }
 
