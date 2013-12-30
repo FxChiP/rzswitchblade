@@ -16,3 +16,11 @@
 *.exe
 *.out
 *.app
+
+# vim
+.*.sw*
+
+# I'm using razer-test as a baseline for
+# some things I'm building into rzswitchblade --
+# maybe one day I'll remove it (or use it better)
+razer-test.c
