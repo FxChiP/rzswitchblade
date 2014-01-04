@@ -48,7 +48,16 @@ ssize_t rzswitchblade_enumerate_devices(rzswitchblade_context *ctx, rzswitchblad
 	/* Figure out which devices are good; store them */
 	for (i = 0; i < length; i++) {
 		dev = list[i];
+
 		libusb_stat = libusb_get_device_descriptor(dev, &dd);
+		if (libusb_stat) {
+			/* whoops again */
+			libusb_free_device_list(list, 1);
+			free(found_devices);
+			found_devices = NULL;
+			return -1;
+		}
+
 		if (dd.idVendor == USB_VID_RAZER) {
 			if (dd.idProduct == USB_PID_RAZER_BLADE) { /* TODO: add PIDs as needed */
 				found_devices[j].dev = dev;
@@ -90,11 +99,17 @@ rzswitchblade_interface *rzswitchblade_claim_device(rzswitchblade_device *device
 	libusb_stat = libusb_open(device->dev, &device->handle);
 	if (libusb_stat) return NULL; 
 
-	/* device opened.
+	/* device opened. */
+	/* If there's a kernel driver attached, detach it. 
 	 * Claim interface 2 on Blade devices. I don't know
 	 * what this value is for DeathStalker Ultimate
 	 * devices.
 	 */
+
+	if (libusb_kernel_driver_active(device->handle, RZSWITCHBLADE_RAZER_BLADE_SWITCHBLADE_INTERFACE)) {
+		libusb_detach_kernel_driver(device->handle, RZSWITCHBLADE_RAZER_BLADE_SWITCHBLADE_INTERFACE);
+	}
+
 	libusb_stat = libusb_claim_interface(device->handle, RZSWITCHBLADE_RAZER_BLADE_SWITCHBLADE_INTERFACE); 
 	if (libusb_stat) {
 		libusb_close(device->handle);
@@ -110,5 +125,43 @@ rzswitchblade_interface *rzswitchblade_claim_device(rzswitchblade_device *device
 
 	ret->rzswitchblade_device = device;
 	return ret;
+}
+
+void rzswitchblade_free_device(rzswitchblade_device *device) {
+	if (!device) return;
+
+	if (device->rzswitchblade_interface) {
+		rzswitchblade_free_interface(device->rzswitchblade_interface); 
+		device->rzswitchblade_interface = NULL;
+	}
+
+	/* XXX: if this doesn't work we're probably screwed anyhow */
+	libusb_attach_kernel_driver(device->handle, RZSWITCHBLADE_RAZER_BLADE_SWITCHBLADE_INTERFACE); 
+
+	libusb_close(device->handle);
+	libusb_unref_device(device->dev); 
+
+	free(device);
+}
+
+void rzswitchblade_free_interface(rzswitchblade_interface *interface) {
+	if (interface) {
+		if (interface->touchpad_transfer) {
+			libusb_free_transfer(interface->touchpad_transfer);
+			interface->touchpad_transfer = NULL;
+		}
+
+		if (interface->ibuttons_transfer) {
+			libusb_free_transfer(interface->ibuttons_transfer);
+			interface->ibuttons_transfer = NULL;
+		}
+
+		if (interface->buffer) {
+			free(interface->buffer);
+			interface->buffer = NULL;
+		}
+
+		free(interface);
+	}
 }
 

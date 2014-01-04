@@ -12,6 +12,9 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 
+#ifndef _RZSWITCHBLADE_H_
+#define _RZSWITCHBLADE_H_
+
 /* libusb */
 #include <libusb.h>
 
@@ -23,8 +26,8 @@
 
 #define RZSWITCHBLADE_RAZER_BLADE_SWITCHBLADE_INTERFACE 2
 
-#define RZSWITCHBLADE_RAZER_BLADE_SWITCHBLADE_TP_EP 0x02
-#define RZSWITCHBLADE_RAZER_BLADE_SWITCHBLADE_IB_EP 0x01
+#define RZSWITCHBLADE_RAZER_BLADE_SWITCHBLADE_TP_EP 0x01
+#define RZSWITCHBLADE_RAZER_BLADE_SWITCHBLADE_IB_EP 0x02
 
 /* structs */
 struct _rzswitchblade_context {
@@ -40,7 +43,7 @@ struct _rzswitchblade_device {
 	rzswitchblade_context *ctx;
 
 	/* Internal use */
-	struct rzswitchblade_interface *rzswitchblade_interface;
+	struct _rzswitchblade_interface *rzswitchblade_interface;
 };
 typedef struct _rzswitchblade_device rzswitchblade_device;
 
@@ -65,4 +68,14 @@ rzswitchblade_context *rzswitchblade_init();
 ssize_t rzswitchblade_enumerate_devices(rzswitchblade_context *ctx, rzswitchblade_device **devices); 
 rzswitchblade_interface *rzswitchblade_claim_device(rzswitchblade_device *device);
 void rzswitchblade_free_device(rzswitchblade_device *device);
+void rzswitchblade_free_interface(rzswitchblade_interface *interface);
+
+/* proto */
+unsigned char *rzswitchblade_blit_header(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2); 
+
+/* blit sync */
+unsigned int rzswitchblade_blit_tp_sync(rzswitchblade_device *device, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, unsigned char *imgbuf);
+unsigned int rzswitchblade_generic_write(rzswitchblade_device *device, unsigned char endpoint, unsigned char *data, size_t length);
+
+#endif
 
