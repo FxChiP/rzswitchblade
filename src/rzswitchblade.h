@@ -20,7 +20,7 @@
 
 /* libsdl */
 
-/* defines */
+/* defines - device management */
 #define USB_VID_RAZER       0x1532
 #define USB_PID_RAZER_BLADE 0x0116
 
@@ -28,6 +28,9 @@
 
 #define RZSWITCHBLADE_RAZER_BLADE_SWITCHBLADE_TP_EP 0x01
 #define RZSWITCHBLADE_RAZER_BLADE_SWITCHBLADE_IB_EP 0x02
+
+/* defines - rzswitchblade operations */
+#define RZSWITCHBLADE_OP_BLIT 0x0001
 
 /* structs */
 struct _rzswitchblade_context {

@@ -28,6 +28,27 @@ depth reduced, because testing has only revealed 16-bit RGB565
 color palette support across a *MAX* resolution of 800x480 (and
 each "macro button" can only hold a 116x116 icon). 
 
+How to Use
+==========
+
+It's not a library yet; rather, the binaries in tests can be
+built and used against the source code that will make up the
+library. So the short answer is...
+
+    sh ./compile-testrzswitchblade-blit.sh
+    ./test-rzswitchblade-blit.sh
+
+If everything goes well, your touchpad should turn completely
+bright blue. (I cannot change it back yet.)
+
+If you're running the synaptics patch I put up on
+http://fxchip.net/RazerBlade/ , you should be okay to run
+./bin-test-rzswitchblade-blit directly -- but if you're
+not AND you don't run it via the harness as recommended, 
+your keyboard and mouse *will* lock hard and you will either
+have to use an external keyboard and mouse and hard reboot the
+machine. YOU HAVE BEEN WARNED.
+
 WORK IN PROGRESS
 ================
 
